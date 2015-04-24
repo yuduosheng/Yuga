@@ -1,5 +1,5 @@
 #include "App.h"
-
+#include "camera.h"
 
 
 namespace shader
@@ -76,12 +76,13 @@ private:
 	void                    setGridCellSize();
 
 private:
-
+	ObjectCamera            camera;
 	GLuint                  vao;
 	GLuint                  program;
 	// This will identify our vertex buffer
 	GLuint                  vertexbuffer;
-	//GLuint                  mvp_matrix;
+	GLuint                  elementbuffer;
+	GLuint                  mvp_matrix;
 };
 
 int main(void)
@@ -95,20 +96,25 @@ int main(void)
 	return 0;
 }
 
-Test::Test() : App()
+Test::Test() : App(), camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), mWidth, mHeight)
 {
 
 }
 
 Test::~Test()
 {
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 	// Cleanup VBO and shader
+	glDeleteProgram(program);
+	glDeleteVertexArrays(1, &vao);
 }
 
 bool Test::Init()
 {
 	if (!App::Init())
 		return false;
+
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	buildShader();
@@ -121,14 +127,31 @@ void Test::onResize(GLFWwindow* window, int nw, int nh)
 	App::onResize(window, nw, nh);
 
 	glViewport(0, 0, nw, nh);
+	camera.setWH(nw, nh);
+	camera.SetProj(45.0f, (GLfloat)nw / (GLfloat)nh, 0.01f, 100.0f);
 
 }
 
 void Test::UpdateScene()
 {
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LESS);
+
+	static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static const GLfloat one = 1.0f;
+
+	glViewport(0, 0, mWidth, mHeight);
+	glClearBufferfv(GL_COLOR, 0, white);
+	glClearBufferfv(GL_DEPTH, 0, &one);
+
+	glUseProgram(program);
+
+	glm::mat4 mvp = camera.getMVP();
+	glUniformMatrix4fv(mvp_matrix, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 void Test::Rendering()
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	/* Draw a triangle 
 	glBegin(GL_TRIANGLES);
 
@@ -155,18 +178,55 @@ void Test::Rendering()
 		);
 
 	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	//glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+	// Index buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+	// Draw the triangles !
+	glDrawElements(
+		GL_TRIANGLES,      // mode
+		12,    // count
+		GL_UNSIGNED_SHORT,   // type
+		(void*)0           // element array buffer offset
+		);
 
 }
 void Test::buildGeometryBuffers()
 {
+	/*
 	// An array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
+		-0.70710678,  -0.40824829,  0.57735027,
+		0.00000000,   0.81649658,   0.57735027,
+		0.70710678,   -0.40824829,  0.57735027,
+		-0.00000000,  -0.81649658,  -0.57735027,
+		-0.70710678,  0.40824829,   -0.57735027,
+		0.70710678,   0.40824829,   -0.57735027
 	};
-
+	static const GLushort g_index_buffer_data[] = {
+		1, 2, 5,
+		1, 5, 4,
+		1, 4, 3,
+		1, 3, 2,
+		2, 3, 6,
+		2, 6, 5,
+		3, 4, 6,
+		4, 5, 6
+	};*/
+	// An array of 3 vectors which represents 3 vertices
+	static const GLfloat g_vertex_buffer_data[] = {
+		0, 0, 0,
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+	};
+	static const GLushort g_index_buffer_data[] = {
+		1, 0, 2,
+		0, 3, 2,
+		1, 0, 3,
+		1, 2, 3
+	};
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
 
@@ -175,6 +235,12 @@ void Test::buildGeometryBuffers()
 
 	// Give our vertices to OpenGL.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	// Generate a buffer for the indices
+
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_index_buffer_data) * sizeof(unsigned short), g_index_buffer_data, GL_STATIC_DRAW);
 
 }
 void Test::buildShader()
@@ -199,18 +265,29 @@ void Test::buildShader()
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	//mvp_matrix = glGetUniformLocation(program, "MVP");
+	mvp_matrix = glGetUniformLocation(program, "MVP");
 
 }
 
 void Test::onMouseWheel(GLFWwindow* window, double x, double y)
 {
-
+	float scale = 1.0f;
+	float mouseWheelScale = 0.1f;
+	scale += mouseWheelScale  * (float)y;
+	camera.setScaleFactor(scale);
+	camera.setMmworldScle();
 }
 void Test::onMouseMove(GLFWwindow* window, double xd, double yd)
 {
 	double x = xd;
 	double y = yd;
+	if (camera.IsMouseLButtonDown())
+	{
+		camera.SetCurMousePosition(x, y);
+		camera.SetRotation();
+		camera.SetPreMousePosition(x, y);
+	}
+
 }
 void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 {
@@ -218,7 +295,13 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 
 	if ((button == GLFW_MOUSE_BUTTON_1) && (action == GLFW_PRESS))
 	{
-
+		camera.SetMouseLButtonStat(true);
+		glfwGetCursorPos(window, &xd, &yd);
+		camera.initMousePosition(xd, yd);
+	}
+	else if ((button == GLFW_MOUSE_BUTTON_1) && (action == GLFW_RELEASE))
+	{
+		camera.SetMouseLButtonStat(false);
 	}
 
 }
