@@ -140,9 +140,6 @@ void Test::onResize(GLFWwindow* window, int nw, int nh)
 
 void Test::UpdateScene()
 {
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LESS);
-
 	static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	static const GLfloat one = 1.0f;
 
@@ -150,9 +147,14 @@ void Test::UpdateScene()
 	glClearBufferfv(GL_COLOR, 0, white);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUseProgram(program);
+
+}
+void Test::Rendering()
+{
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glm::mat4 MVP = camera.getMVP();
 	glm::mat4 M = camera.getM();
@@ -161,13 +163,8 @@ void Test::UpdateScene()
 	glUniformMatrix4fv(mvp_matrix, 1, GL_FALSE, glm::value_ptr(MVP));
 	glUniformMatrix4fv(v_matrix, 1, GL_FALSE, glm::value_ptr(V));
 	glUniformMatrix4fv(m_matrix, 1, GL_FALSE, glm::value_ptr(M));
-	glm::vec3 lightPos = glm::vec3(5.0f, 5.0f, 5.0f);
+	glm::vec3 lightPos = glm::vec3(10.0f, 10.0f, 10.0f);
 	glUniform3f(l_position, lightPos.x, lightPos.y, lightPos.z);
-}
-void Test::Rendering()
-{
-	
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	dino.RenderModel();
 
