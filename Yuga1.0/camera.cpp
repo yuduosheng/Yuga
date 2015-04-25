@@ -176,7 +176,7 @@ void ObjectCamera::SetRotation()
 	val = val / (glm::length(preV) * glm::length(curV))-0.00001;
 	val = acos(val);
 
-	glm::mat4 rotateM = glm::rotate(val*15, axis);
+	glm::mat4 rotateM = glm::rotate(val*100, axis);
 
 	mWorld = rotateM * mWorld;
 }

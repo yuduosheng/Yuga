@@ -1,6 +1,6 @@
 #include "App.h"
 #include "camera.h"
-
+#include "tetMesh.h"
 
 namespace shader
 {
@@ -82,7 +82,13 @@ private:
 	// This will identify our vertex buffer
 	GLuint                  vertexbuffer;
 	GLuint                  elementbuffer;
+
 	GLuint                  mvp_matrix;
+	GLuint                  m_matrix;
+	GLuint                  v_matrix;
+	GLuint                  l_position;
+
+	TetMesh                 dino;
 };
 
 int main(void)
@@ -96,7 +102,7 @@ int main(void)
 	return 0;
 }
 
-Test::Test() : App(), camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), mWidth, mHeight)
+Test::Test() : App(), camera(glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), mWidth, mHeight), dino("dino.1")
 {
 
 }
@@ -118,7 +124,7 @@ bool Test::Init()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	buildShader();
-	buildGeometryBuffers();
+	//buildGeometryBuffers();
 	return true;
 }
 
@@ -144,14 +150,27 @@ void Test::UpdateScene()
 	glClearBufferfv(GL_COLOR, 0, white);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUseProgram(program);
 
-	glm::mat4 mvp = camera.getMVP();
-	glUniformMatrix4fv(mvp_matrix, 1, GL_FALSE, glm::value_ptr(mvp));
+	glm::mat4 MVP = camera.getMVP();
+	glm::mat4 M = camera.getM();
+	glm::mat4 V = camera.getV();
+
+	glUniformMatrix4fv(mvp_matrix, 1, GL_FALSE, glm::value_ptr(MVP));
+	glUniformMatrix4fv(v_matrix, 1, GL_FALSE, glm::value_ptr(V));
+	glUniformMatrix4fv(m_matrix, 1, GL_FALSE, glm::value_ptr(M));
+	glm::vec3 lightPos = glm::vec3(5.0f, 5.0f, 5.0f);
+	glUniform3f(l_position, lightPos.x, lightPos.y, lightPos.z);
 }
 void Test::Rendering()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	dino.RenderModel();
+
 	/* Draw a triangle 
 	glBegin(GL_TRIANGLES);
 
@@ -166,6 +185,7 @@ void Test::Rendering()
 
 	glEnd();*/
 	// 1rst attribute buffer : vertices
+	/*
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(
@@ -190,7 +210,7 @@ void Test::Rendering()
 		GL_UNSIGNED_SHORT,   // type
 		(void*)0           // element array buffer offset
 		);
-
+*/
 }
 void Test::buildGeometryBuffers()
 {
@@ -248,8 +268,8 @@ void Test::buildShader()
 	GLuint vs;
 	GLuint fs;
 
-	vs = shader::loadShader("ColorVertexShader.glsl", GL_VERTEX_SHADER, true);
-	fs = shader::loadShader("ColorFragmentShader.glsl", GL_FRAGMENT_SHADER, true);
+	vs = shader::loadShader("lighting.vs.glsl", GL_VERTEX_SHADER, true);
+	fs = shader::loadShader("lighting.fs.glsl", GL_FRAGMENT_SHADER, true);
 
 	//vs = shader::loadShader("ColorVertexShader.glsl", GL_VERTEX_SHADER, true);
 	//fs = shader::loadShader("ColorFragmentShader.glsl", GL_FRAGMENT_SHADER, true);
@@ -266,6 +286,9 @@ void Test::buildShader()
 	glDeleteShader(fs);
 
 	mvp_matrix = glGetUniformLocation(program, "MVP");
+	v_matrix = glGetUniformLocation(program, "V");
+	m_matrix = glGetUniformLocation(program, "M");
+	l_position = glGetUniformLocation(program, "LightPosition_worldspace");
 
 }
 

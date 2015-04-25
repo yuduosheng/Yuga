@@ -33,8 +33,8 @@ static void mousewheel_callback(GLFWwindow* window, double x, double y)
 	g_App->onMouseWheel(window, x, y);
 }
 ////////////////////////////////////////////////////////////////////////////////////
-App::App() :mTitle("sample app"), mWidth(800),
-mHeight(600), isTransparency(false), isLineSmooth(false)
+App::App() :mTitle("sample app"), mWidth(1200),
+mHeight(800), isTransparency(false), isLineSmooth(false)
 {
 	g_App = this;
 }

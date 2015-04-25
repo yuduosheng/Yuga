@@ -82,15 +82,19 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="tetMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tetMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ColorFragmentShader.glsl" />
     <None Include="ColorVertexShader.glsl" />
+    <None Include="lighting.fs.glsl" />
+    <None Include="lighting.vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
