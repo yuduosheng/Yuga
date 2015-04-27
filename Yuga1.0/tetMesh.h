@@ -29,6 +29,8 @@ struct Tetrahedron {
 };
 class TetMesh
 {
+
+	friend class CorotationalLinearFEM;
 public:
 	// loads a file of a "special" (not .veg) type
 	// currently one such special format is supported:
@@ -40,7 +42,11 @@ public:
 	void ReadModelFromFile(const char * filename);
 	// === misc queries ===
 	glm::dvec3 getElementCenter(int el) const;
-	static double getTetVolume(glm::vec3 * a, glm::vec3 * b, glm::vec3 * c, glm::vec3 * d);
+
+	float GetTetraVolume(glm::vec3 e1, glm::vec3 e2, glm::vec3 e3) {
+		return  (glm::dot(e1, glm::cross(e2, e3))) / 6.0f;
+	}
+
 	static double getTetDeterminant(glm::vec3 * a, glm::vec3 * b, glm::vec3 * c, glm::vec3 * d);
 	double getElementVolume(int el) const;
 	void getElementInertiaTensor(int el, glm::dmat3 & inertiaTensor) const;
@@ -62,6 +68,12 @@ public:
 	//=====render=======
 	void CalculateVN();
 	void RenderModel();
+
+	//====member queries====
+	int GetVetexNumber(){return total_points;}
+	int GetTetNumber(){ return total_tetrahedra; }
+
+
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
@@ -81,12 +93,18 @@ protected:
 		t.indices[2] = i2;
 		t.indices[3] = i3;
 
+		t.e1 = oriCoordinates[i1] - oriCoordinates[i0];
+		t.e2 = oriCoordinates[i2] - oriCoordinates[i0];
+		t.e3 = oriCoordinates[i3] - oriCoordinates[i0];
+        
+		t.volume = GetTetraVolume(t.e1, t.e2, t.e3);
+
 		tetrahedra.push_back(t);
 	}
 
 	//void computeElementMassMatrixHelper(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, double * buffer);
 
-private:
+protected:
 	vector<glm::vec3> oriCoordinates;
 	vector<glm::vec3> curCoordinates;
 

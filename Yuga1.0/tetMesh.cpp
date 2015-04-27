@@ -154,19 +154,10 @@ glm::dvec3 TetMesh::getElementCenter(int el) const
 
 	return pos;
 }
-double TetMesh::getTetVolume(glm::vec3 * a, glm::vec3 * b, glm::vec3 * c, glm::vec3 * d)
-{
-	// volume = 1/6 * | (a-d) . ((b-d) x (c-d)) |
-	return (1.0 / 6 * fabs(glm::dot(*a - *d, glm::cross(*b - *d, *c - *d))));
-}
 
 double TetMesh::getElementVolume(int el) const
 {
-	glm::vec3 a = curCoordinates[tetrahedra[el].indices[0]];
-	glm::vec3 b = curCoordinates[tetrahedra[el].indices[1]];
-	glm::vec3 c = curCoordinates[tetrahedra[el].indices[2]];
-	glm::vec3 d = curCoordinates[tetrahedra[el].indices[3]];
-	return getTetVolume(&a, &b, &c, &d);
+
 }
 
 void TetMesh::getElementInertiaTensor(int el, glm::dmat3 & inertiaTensor) const

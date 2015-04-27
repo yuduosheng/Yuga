@@ -23,9 +23,9 @@ void main(){
 	float LightPower = 200.0f;
 	
 	// Material properties
-	vec3 MaterialDiffuseColor = vec3(0.5,0.5,0.5);//texture2D( myTextureSampler, UV ).rgb;
+	vec3 MaterialDiffuseColor = vec3(0.3,0.3,0.3);//texture2D( myTextureSampler, UV ).rgb;
 	vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * MaterialDiffuseColor;
-	vec3 MaterialSpecularColor = vec3(0.9,0.9,0.9);
+	vec3 MaterialSpecularColor = vec3(0.8,0.8,0.8);
 
 	// Distance to the light
 	float distance = length( LightPosition_worldspace - Position_worldspace );
