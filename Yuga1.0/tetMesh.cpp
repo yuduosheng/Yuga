@@ -4,9 +4,9 @@ ofstream debug("debug.txt");
 
 TetMesh::TetMesh(const char * filename)
 {
-	double E = 1E8;
-	double nu = 0.45;
-	double density = 1000;
+	lambda = nu_ * E_ / ((1 + nu_)*(1 - 2 * nu_));
+	mu = 0.5 * E_ / (1 + nu_);
+
 	ReadModelFromFile(filename);
 }
 
@@ -162,10 +162,10 @@ double TetMesh::getElementVolume(int el) const
 
 void TetMesh::getElementInertiaTensor(int el, glm::dmat3 & inertiaTensor) const
 {
-	glm::vec3 a = curCoordinates[tetrahedra[el].indices[0]];
-	glm::vec3 b = curCoordinates[tetrahedra[el].indices[1]];
-	glm::vec3 c = curCoordinates[tetrahedra[el].indices[2]];
-	glm::vec3 d = curCoordinates[tetrahedra[el].indices[3]];
+	glm::dvec3 a = curCoordinates[tetrahedra[el].indices[0]];
+	glm::dvec3 b = curCoordinates[tetrahedra[el].indices[1]];
+	glm::dvec3 c = curCoordinates[tetrahedra[el].indices[2]];
+	glm::dvec3 d = curCoordinates[tetrahedra[el].indices[3]];
 
 	glm::dvec3 center = getElementCenter(el);
 	a -= center;
@@ -194,7 +194,7 @@ void TetMesh::getElementInertiaTensor(int el, glm::dmat3 & inertiaTensor) const
 	inertiaTensor = glm::dmat3(A, -Bp, -Cp, -Bp, B, -Ap, -Cp, -Ap, C);
 }
 
-bool TetMesh::containsVertex(int el, glm::vec3 pos) const // true if given element contain given position, false otherwise
+bool TetMesh::containsVertex(int el, glm::dvec3 pos) const // true if given element contain given position, false otherwise
 {
 	double weights[4];
 	computeBarycentricWeights(el, pos, weights);
@@ -203,7 +203,7 @@ bool TetMesh::containsVertex(int el, glm::vec3 pos) const // true if given eleme
 	return ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0));
 }
 
-void TetMesh::computeBarycentricWeights(int el, glm::vec3 pos, double * weights) const
+void TetMesh::computeBarycentricWeights(int el, glm::dvec3 pos, double * weights) const
 {
 	/*
 	|x1 y1 z1 1|
@@ -234,7 +234,7 @@ void TetMesh::computeBarycentricWeights(int el, glm::vec3 pos, double * weights)
 	wi = Di / D0
 	*/
 
-	glm::vec3 vtx[4];
+	glm::dvec3 vtx[4];
 	for (int i = 0; i<4; i++)
 		vtx[i] = curCoordinates[tetrahedra[el].indices[i]];
 
@@ -243,7 +243,7 @@ void TetMesh::computeBarycentricWeights(int el, glm::vec3 pos, double * weights)
 
 	for (int i = 1; i <= 4; i++)
 	{
-		glm::vec3 buf[4];
+		glm::dvec3 buf[4];
 		for (int j = 0; j<4; j++)
 			buf[j] = vtx[j];
 		buf[i - 1] = pos;
@@ -252,23 +252,26 @@ void TetMesh::computeBarycentricWeights(int el, glm::vec3 pos, double * weights)
 	}
 }
 
-double TetMesh::getTetDeterminant(glm::vec3 * a, glm::vec3 * b, glm::vec3 * c, glm::vec3 * d)
+double TetMesh::getTetDeterminant(glm::dvec3 * a, glm::dvec3 * b, glm::dvec3 * c, glm::dvec3 * d)
 {
 	// computes the determinant of the 4x4 matrix
 	// [ a 1 ]
 	// [ b 1 ]
 	// [ c 1 ]
 	// [ d 1 ]
-	glm::vec4 aa = glm::vec4(a->x, b->x, c->x, d->x);
-	glm::vec4 bb = glm::vec4(a->y, b->y, c->z, d->y);
-	glm::vec4 cc = glm::vec4(a->z, b->y, c->z, d->z);
-	glm::vec4 dd = glm::vec4(1, 1, 1, 1);
+	glm::dvec4 aa = glm::dvec4(a->x, b->x, c->x, d->x);
+	glm::dvec4 bb = glm::dvec4(a->y, b->y, c->z, d->y);
+	glm::dvec4 cc = glm::dvec4(a->z, b->y, c->z, d->z);
+	glm::dvec4 dd = glm::dvec4(1, 1, 1, 1);
 
 	glm::mat4 mat = glm::mat4(aa, bb, cc, dd);
 
 	return glm::determinant(mat);
 }
-
+int TetMesh::getVertexIndex(int el, int ver)
+{
+	return tetrahedra[el].indices[ver];
+}
 
 void TetMesh::CalculateVN()
 {

@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Yuga1.0", "Yuga1.0\Yuga1.0.vcxproj", "{EDBFF82F-71EA-4FAB-93CC-F77C36E13F05}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{1D8EC054-5EE6-491C-AEE9-98902059F51B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{EDBFF82F-71EA-4FAB-93CC-F77C36E13F05}.Debug|Win32.Build.0 = Debug|Win32
 		{EDBFF82F-71EA-4FAB-93CC-F77C36E13F05}.Release|Win32.ActiveCfg = Release|Win32
 		{EDBFF82F-71EA-4FAB-93CC-F77C36E13F05}.Release|Win32.Build.0 = Release|Win32
+		{1D8EC054-5EE6-491C-AEE9-98902059F51B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D8EC054-5EE6-491C-AEE9-98902059F51B}.Debug|Win32.Build.0 = Debug|Win32
+		{1D8EC054-5EE6-491C-AEE9-98902059F51B}.Release|Win32.ActiveCfg = Release|Win32
+		{1D8EC054-5EE6-491C-AEE9-98902059F51B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

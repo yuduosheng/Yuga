@@ -54,7 +54,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(TetMesh * tetMesh_)
 		float invE22 = (e10.x*e30.y - e10.y*e30.x)*invDetE;
 		float invE32 = (e10.y*e20.x - e10.x*e20.y)*invDetE;
 		float invE02 = -invE12 - invE22 - invE32;
-
+/*
 		tetMesh->tetrahedra[i].B[0] = glm::vec3(invE00, invE01, invE02);
 		tetMesh->tetrahedra[i].B[1] = glm::vec3(invE10, invE11, invE12);
 		tetMesh->tetrahedra[i].B[2] = glm::vec3(invE20, invE21, invE22);
@@ -83,7 +83,7 @@ CorotationalLinearFEM::CorotationalLinearFEM(TetMesh * tetMesh_)
 
 				Ke *= tetMesh->tetrahedra[i].volume;
 			}
-		}
+		}*/
 	}
 }
 
@@ -105,23 +105,5 @@ void CorotationalLinearFEM::RecalcMassMatrix() {
 		mass[tetMesh->tetrahedra[i].indices[1]] += m;
 		mass[tetMesh->tetrahedra[i].indices[2]] += m;
 		mass[tetMesh->tetrahedra[i].indices[3]] += m;
-	}
-}
-
-void CorotationalLinearFEM::InitializePlastic() {
-	for (size_t i = 0; i<tetMesh->total_tetrahedra; i++) {
-		for (int j = 0; j<6; j++)
-			tetMesh->tetrahedra[i].plastic[j] = 0;
-	}
-}
-
-void CorotationalLinearFEM::ClearStiffnessAssembly() {
-	for (size_t k = 0; k<tetMesh->total_points; k++) {
-		F0[k].x = 0.0f;
-		F0[k].y = 0.0f;
-		F0[k].z = 0.0f;
-
-		for (matrix_iterator Kij = K_row[k].begin(); Kij != K_row[k].end(); ++Kij)
-			Kij->second = glm::mat3(0);
 	}
 }

@@ -27,6 +27,15 @@
     <ClInclude Include="corotationalLinearFEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StVKTet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StvkTetABCD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StVKInternalForces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -42,6 +51,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="corotationalLinearFEM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StVKTet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StVKTetABCD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StVKInternalForces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

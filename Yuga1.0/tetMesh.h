@@ -15,12 +15,12 @@ struct BoundaryTriangle
 
 struct Tetrahedron {
 	int indices[4];			//indices
-	float volume;			//volume 
-	float plastic[6];		//plasticity values
+	double volume;			//volume 
+	//float plastic[6];		//plasticity values
 	glm::vec3 e1, e2, e3;	//edges
-	glm::mat3 Re;			//Rotational warp of tetrahedron.
-	glm::mat3 Ke[4][4];		//Stiffness element matrix
-	glm::vec3 B[4];			//Jacobian of shapefunctions; B=SN =[d/dx  0     0 ][wn 0  0]
+	//glm::mat3 Re;			//Rotational warp of tetrahedron.
+	//glm::mat3 Ke[4][4];		//Stiffness element matrix
+	//glm::vec3 B[4];			//Jacobian of shapefunctions; B=SN =[d/dx  0     0 ][wn 0  0]
 	//                                  [0    d/dy   0 ][0 wn  0]
 	//									[0     0   d/dz][0  0 wn]
 	//									[d/dy d/dx   0 ]
@@ -30,7 +30,10 @@ struct Tetrahedron {
 class TetMesh
 {
 
-	friend class CorotationalLinearFEM;
+	friend class CorotationalLinearFEM; 
+	friend class StvkTet;
+	friend class StVKTetABCD;
+	friend class StVKInternalForces;
 public:
 	// loads a file of a "special" (not .veg) type
 	// currently one such special format is supported:
@@ -47,16 +50,16 @@ public:
 		return  (glm::dot(e1, glm::cross(e2, e3))) / 6.0f;
 	}
 
-	static double getTetDeterminant(glm::vec3 * a, glm::vec3 * b, glm::vec3 * c, glm::vec3 * d);
+	static double getTetDeterminant(glm::dvec3 * a, glm::dvec3 * b, glm::dvec3 * c, glm::dvec3 * d);
 	double getElementVolume(int el) const;
 	void getElementInertiaTensor(int el, glm::dmat3 & inertiaTensor) const;
 	void computeElementMassMatrix(int element, double * massMatrix) const;
 
-	bool containsVertex(int element, glm::vec3 pos) const; // true if given element contain given position, false otherwise
+	bool containsVertex(int element, glm::dvec3 pos) const; // true if given element contain given position, false otherwise
 
 	// === interpolation ===
 
-	void computeBarycentricWeights(int el, glm::vec3 pos, double * weights) const;
+	void computeBarycentricWeights(int el, glm::dvec3 pos, double * weights) const;
 	//void computeGradient(int element, const double * U, int numFields, double * grad) const; // for tet meshes, gradient is constant inside each tet, hence no need to specify position
 	//void interpolateGradient(int element, const double * U, int numFields, glm::vec3 pos, double * grad) const; // conforms to the virtual function in the base class, "pos" does not affect the computation
 
@@ -72,7 +75,7 @@ public:
 	//====member queries====
 	int GetVetexNumber(){return total_points;}
 	int GetTetNumber(){ return total_tetrahedra; }
-
+	int getVertexIndex(int el, int ver);
 
 protected:
 
@@ -105,14 +108,20 @@ protected:
 	//void computeElementMassMatrixHelper(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d, double * buffer);
 
 protected:
-	vector<glm::vec3> oriCoordinates;
-	vector<glm::vec3> curCoordinates;
+	float nu_ = 0.33f;			//Poisson ratio
+	float E_ = 15000.0f;		//Young modulus
+	double lambda;
+	double mu;
+
+
+	vector<glm::dvec3> oriCoordinates;
+	vector<glm::dvec3> curCoordinates;
 
 	vector<Tetrahedron> tetrahedra;
 	vector<BoundaryTriangle> bTriangle;
 
-	vector<glm::vec3> normalOfTriangle;
-	vector<glm::vec3> normalOfVetex;
+	vector<glm::dvec3> normalOfTriangle;
+	vector<glm::dvec3> normalOfVetex;
 	vector<vector<int>> trianglesOfVertices;
 
 	int total_points = 0;
