@@ -82,21 +82,17 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="corotationalLinearFEM.h" />
-    <ClInclude Include="StVKInternalForces.h" />
-    <ClInclude Include="StVKTet.h" />
-    <ClInclude Include="StvkTetABCD.h" />
-    <ClInclude Include="tetMesh.h" />
+    <ClInclude Include="COO_MATRIX.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialLinearElasticity.h" />
+    <ClInclude Include="SETTINGS.h" />
+    <ClInclude Include="TetMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="corotationalLinearFEM.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="StVKInternalForces.cpp" />
-    <ClCompile Include="StVKTet.cpp" />
-    <ClCompile Include="StVKTetABCD.cpp" />
-    <ClCompile Include="tetMesh.cpp" />
+    <ClCompile Include="TetMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ColorFragmentShader.glsl" />

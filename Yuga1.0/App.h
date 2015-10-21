@@ -7,19 +7,7 @@
 #include <windows.h>
 #endif
 
-#include <cstdio>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-using namespace std;
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-using namespace glm;
+#include "SETTINGS.h"
 
 class App
 {

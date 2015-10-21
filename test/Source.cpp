@@ -3,63 +3,55 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cassert>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <Eigen/Geometry>
+
+
 #include <iostream>
+
 using namespace std;
 
-typedef struct
-{
-	double volume;
-	glm::dvec3 Phig[4]; // gradient of a basis function
-} elementData;
+typedef Eigen::Vector3d VEC3F;
+typedef Eigen::Vector2d VEC2F;
+typedef Eigen::VectorXd VECTOR;
+typedef Eigen::ArrayXd ARRAY;
+typedef Eigen::MatrixXd MATRIX;
+typedef double Real;
+typedef Eigen::Matrix3d MATRIX3;
+typedef Eigen::Matrix4d MATRIX4;
+typedef Eigen::Matrix<double, 3, 4, Eigen::ColMajor> MATRIX3x4;
+typedef Eigen::Matrix<double, 9, 9, Eigen::RowMajor> MATRIX9;
+typedef Eigen::SparseMatrix<double, Eigen::RowMajor> SpMat;
+typedef Eigen::Quaternion<double> QUATERNION;
+typedef Eigen::Triplet<double> TRIPLET;
+typedef Eigen::Vector3i VEC3I;
+typedef unsigned int UINT;
 
-void StVKSingleTetABCD(glm::dvec3 vtx[4], elementData * target)
-{
-	//double det = TetMesh::getTetDeterminant(&vtx[0], &vtx[1], &vtx[2], &vtx[3]);
-	double det = 1.0f;
-	target->volume = 0.33f;//fabs(det / 6);
-
-	for (int i = 0; i<4; i++)
-		for (int j = 0; j<3; j++)
-		{
-			glm::dvec3 columns[2];
-			int countI = 0;
-			for (int ii = 0; ii<4; ii++)
-			{
-				if (ii == i)
-					continue;
-				int countJ = 0;
-				for (int jj = 0; jj<3; jj++)
-				{
-					if (jj == j)
-						continue;
-
-					columns[countJ][countI] = vtx[ii][jj];
-					cout <<countJ<<" "<<countI<< " " <<ii << " " << jj << endl;
-					countJ++;
-				}
-				countI++;
-			}
-			int sign = (((i + j) % 2) == 0) ? 1 : -1;
-			target->Phig[i][j] = 1.0 * sign * glm::dot(glm::dvec3(1, 1, 1), glm::cross(columns[0], columns[1])) / det;
-			
-		}
-}
+#include "COO_MATRIX.h"
 
 int main()
 {
-	glm::dvec3 vtx[4];
-	vtx[0] = glm::dvec3(1.0f, 0, 0);
-	vtx[1] = glm::dvec3(0.0f, 1.0f, 0);
-	vtx[2] = glm::dvec3(0.0f, 0, 1.0f);
-	vtx[3] = glm::dvec3(0.0f, 0, 0);
-	elementData el;
-	StVKSingleTetABCD(vtx, &el);
+	//MATRIX4 mat;
+	//mat <<  2, 1, 1, 1,
+	//		1, 2, 1, 1,
+	//		1, 1, 2, 1,
+	//		1, 1, 1, 2;
+	//MATRIX3 mat3(0);
+	//cout << mat3 << endl;
+	//cout << mat << endl;
+	COO_MATRIX mat;
+	mat.add(1.1, 0, 0);
+	mat.add(1.2, 0, 1);
+	mat.add(1.3, 1, 0);
+	mat.add(1.3, 1, 1);
 
-	cout << el.Phig[0][0] << " " << el.Phig[0][1] << " " << el.Phig[0][1] << endl;
-	cout << el.Phig[1][0] << " " << el.Phig[1][1] << " " << el.Phig[1][1] << endl;
-	cout << el.Phig[2][0] << " " << el.Phig[2][1] << " " << el.Phig[2][1] << endl;
-	cout << el.Phig[3][0] << " " << el.Phig[3][1] << " " << el.Phig[3][1] << endl;
+	mat.add(1.1, 1, 0);
+	mat.add(1.1, 1, 1);
 
+	mat.add(2, 2, 2);
+	mat.PrintEntry();
 	system("pause");
 	return 0;
 }

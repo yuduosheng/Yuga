@@ -89,6 +89,8 @@ private:
 	GLuint                  l_position;
 
 	TetMesh                 dino;
+
+	bool					isFill;
 };
 
 int main(void)
@@ -102,7 +104,8 @@ int main(void)
 	return 0;
 }
 
-Test::Test() : App(), camera(glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f), mWidth, mHeight), dino("dino.1")
+Test::Test() : App(), camera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 2.0f, 0.0f), mWidth, mHeight), dino("capsule2.1"),
+isFill(true)
 {
 
 }
@@ -120,6 +123,10 @@ bool Test::Init()
 {
 	if (!App::Init())
 		return false;
+
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -140,21 +147,14 @@ void Test::onResize(GLFWwindow* window, int nw, int nh)
 
 void Test::UpdateScene()
 {
-	static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static const GLfloat background[] = { 0.1f, 0.1f, 0.1f, 0.1f };
 	static const GLfloat one = 1.0f;
 
 	glViewport(0, 0, mWidth, mHeight);
-	glClearBufferfv(GL_COLOR, 0, white);
+	glClearBufferfv(GL_COLOR, 0, background);
 	glClearBufferfv(GL_DEPTH, 0, &one);
 
 	glUseProgram(program);
-
-}
-void Test::Rendering()
-{
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glm::mat4 MVP = camera.getMVP();
 	glm::mat4 M = camera.getM();
@@ -166,6 +166,13 @@ void Test::Rendering()
 	glm::vec3 lightPos = glm::vec3(10.0f, 10.0f, 10.0f);
 	glUniform3f(l_position, lightPos.x, lightPos.y, lightPos.z);
 
+	if (isFill)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+void Test::Rendering()
+{
 	dino.RenderModel();
 
 	/* Draw a triangle 
@@ -328,8 +335,9 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 void Test::onKey(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	App::onKey(window, key, scancode, action, mods);
-	if ((key == GLFW_KEY_SPACE) && (action == GLFW_PRESS))
+	if ((key == GLFW_KEY_1) && (action == GLFW_PRESS))
 	{
+		isFill = !isFill;
 	}
 
 }

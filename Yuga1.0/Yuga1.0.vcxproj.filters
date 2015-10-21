@@ -21,19 +21,19 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tetMesh.h">
+    <ClInclude Include="SETTINGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="corotationalLinearFEM.h">
+    <ClInclude Include="TetMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StVKTet.h">
+    <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StvkTetABCD.h">
+    <ClInclude Include="MaterialLinearElasticity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StVKInternalForces.h">
+    <ClInclude Include="COO_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,19 +47,7 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tetMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="corotationalLinearFEM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StVKTet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StVKTetABCD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StVKInternalForces.cpp">
+    <ClCompile Include="TetMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
