@@ -5,6 +5,7 @@ ofstream debug("debug.txt");
 TetMesh::TetMesh(const char * filename)
 {
 	ReadModelFromFile(filename);
+	init();
 }
 
 void TetMesh::ReadModelFromFile(const char *filename)
@@ -110,6 +111,27 @@ void TetMesh::ReadModelFromFile(const char *filename)
 	*/
 
 	faceFile.close();
+}
+
+void TetMesh::init()
+{
+	//compute tet InverDm
+	VEC3F Dm[3];
+	_InverDm.resize(total_tetrahedra);
+	for (int i = 0; i < total_tetrahedra; ++i)
+	{
+		Dm[0] = oriCoordinates[getVertexIndex(i, 1)] - oriCoordinates[getVertexIndex(i, 0)];
+		Dm[1] = oriCoordinates[getVertexIndex(i, 2)] - oriCoordinates[getVertexIndex(i, 0)];
+		Dm[2] = oriCoordinates[getVertexIndex(i, 3)] - oriCoordinates[getVertexIndex(i, 0)];
+
+		_InverDm[i].setZero();
+		_InverDm[i] << Dm[0][0], Dm[1][0], Dm[2][0],
+					   Dm[0][1], Dm[1][1], Dm[2][1],
+					   Dm[0][2], Dm[1][2], Dm[2][2];
+
+		_InverDm[i] = _InverDm[i].inverse();
+	}
+	
 }
 
 void TetMesh::computeElementMassMatrix(int el, double * massMatrix)
@@ -274,5 +296,18 @@ void TetMesh::RenderModel()
 
 void TetMesh::computeMassMatrix()
 {
+	//lumped mass
+	double density = 1000.0;
 
+	_massMatrix.resize(3 * total_points, 3 * total_points);
+
+	for (int i = 0; i < total_tetrahedra; ++i)
+	{
+		double mass = density * getElementVolume(i) / 4.0f;
+		for (int j = 0; j < 4; j++)
+			for (int k = 0; k < 3; k++)
+			{
+				_massMatrix.add(mass, getVertexIndex(i, j) * 3 + k, getVertexIndex(i, j) * 3 + k);
+			}	
+	}
 }

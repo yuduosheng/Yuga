@@ -38,20 +38,25 @@ int main()
 	//		1, 2, 1, 1,
 	//		1, 1, 2, 1,
 	//		1, 1, 1, 2;
-	//MATRIX3 mat3(0);
+	MATRIX3 mat3;
 	//cout << mat3 << endl;
 	//cout << mat << endl;
-	COO_MATRIX mat;
-	mat.add(1.1, 0, 0);
-	mat.add(1.2, 0, 1);
-	mat.add(1.3, 1, 0);
-	mat.add(1.3, 1, 1);
+	//COO_MATRIX mat;
+	//mat.add(1.1, 0, 0);
+	//mat.add(1.2, 0, 1);
+	//mat.add(1.3, 1, 0);
+	//mat.add(1.3, 1, 1);
+	//
+	//mat.add(1.1, 1, 0);
+	//mat.add(1.1, 1, 1);
+	//
+	//mat.add(2, 2, 2);
+	//mat.PrintEntry();
 
-	mat.add(1.1, 1, 0);
-	mat.add(1.1, 1, 1);
-
-	mat.add(2, 2, 2);
-	mat.PrintEntry();
+	mat3 << 3, 0, 0,
+		0, 4, 0,
+		0, 0, 3;
+	cout << mat3.inverse().eval() << endl;
 	system("pause");
 	return 0;
 }

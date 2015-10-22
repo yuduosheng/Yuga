@@ -38,6 +38,7 @@ public:
 	// default material parameters will be used
 	TetMesh(const char * filename);
 	void ReadModelFromFile(const char * filename);
+	void init();
 	// === misc queries ===
 	void computeMassMatrix();
 
@@ -62,7 +63,9 @@ public:
 	int GetVetexNumber(){ return total_points; }
 	int GetTetNumber(){ return total_tetrahedra; }
 	int getVertexIndex(int el, int ver);
-
+	vector<VEC3F>& getCurVertexBuffer(){ return curCoordinates; }
+	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
+	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
@@ -103,6 +106,10 @@ protected:
 	vector<VEC3F> normalOfTriangle;
 	vector<VEC3F> normalOfVetex;
 	vector<vector<int>> trianglesOfVertices;
+	//matrix
+	COO_MATRIX _massMatrix;
+	vector<MATRIX3> _InverDm;
+	//vector<MATRIX3> _F;//deformation gradient
 
 	int total_points;
 	int total_tetrahedra;

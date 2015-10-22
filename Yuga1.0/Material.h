@@ -11,6 +11,10 @@ protected:
 	Real _mu;
 	Real _lambda;
 
+	VECTOR _solutionX;
+	VECTOR _InternalForce;
+
+
 	Material(Real Young, Real Poisson)
 	{
 		_Young = Young;
@@ -21,6 +25,7 @@ protected:
 	~Material() {}
 
 	virtual MATRIX3 firstPiolaKirchhoff(const MATRIX3 &F) = 0;
+	virtual VECTOR& computeInternalForce() = 0;
 
 };
 
