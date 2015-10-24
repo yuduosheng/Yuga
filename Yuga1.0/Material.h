@@ -11,9 +11,8 @@ protected:
 	Real _mu;
 	Real _lambda;
 
-	VECTOR _solutionX;
 	VECTOR _InternalForce;
-
+	COO_MATRIX stiffnessMatrix;
 
 	Material(Real Young, Real Poisson)
 	{
@@ -26,7 +25,7 @@ protected:
 
 	virtual MATRIX3 firstPiolaKirchhoff(const MATRIX3 &F) = 0;
 	virtual VECTOR& computeInternalForce() = 0;
-
+	virtual COO_MATRIX& computeStiffnessMatrix() = 0;
 };
 
 #endif

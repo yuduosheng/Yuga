@@ -64,8 +64,10 @@ public:
 	int GetTetNumber(){ return total_tetrahedra; }
 	int getVertexIndex(int el, int ver);
 	vector<VEC3F>& getCurVertexBuffer(){ return curCoordinates; }
+	vector<VEC3F>& getOldPosition(){ return oldPosition; }
 	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
+	VECTOR& getDisplacement(){ return _movex; }
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
@@ -99,6 +101,8 @@ protected:
 protected:
 	vector<VEC3F> oriCoordinates;
 	vector<VEC3F> curCoordinates;
+	vector<VEC3F> oldPosition;
+	VECTOR        _movex;
 
 	vector<Tetrahedron> tetrahedra;
 	vector<BoundaryTriangle> bTriangle;

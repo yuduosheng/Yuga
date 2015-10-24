@@ -36,6 +36,9 @@
     <ClInclude Include="COO_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FULLIntegrator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">

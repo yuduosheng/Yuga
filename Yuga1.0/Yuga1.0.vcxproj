@@ -83,6 +83,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="COO_MATRIX.h" />
+    <ClInclude Include="FULLIntegrator.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialLinearElasticity.h" />
     <ClInclude Include="SETTINGS.h" />

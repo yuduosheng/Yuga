@@ -131,7 +131,10 @@ void TetMesh::init()
 
 		_InverDm[i] = _InverDm[i].inverse();
 	}
-	
+	oldPosition = curCoordinates;
+
+	_movex.resize(total_points * 3);
+	_movex.setZero();
 }
 
 void TetMesh::computeElementMassMatrix(int el, double * massMatrix)
