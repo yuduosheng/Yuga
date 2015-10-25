@@ -64,7 +64,8 @@ public:
 			}
 		}
 	} 
-
+	//force differential
+	/*
 	COO_MATRIX& computeStiffnessMatrix()
 	{
 		VECTOR& move = _tetMesh->getDisplacement();//displacement;
@@ -131,6 +132,64 @@ public:
 				_InternalForce[t.indices[i] * 3 + 2] += forces[i][2];
 				}
 
+			}
+		}
+	}
+	*/
+	//stiffness matrix
+	COO_MATRIX& computeStiffnessMatrix()
+	{
+		stiffnessMatrix.resize(_tetMesh->GetVetexNumber() * 3, _tetMesh->GetVetexNumber() * 3);
+		vector<VEC3F>& curVer = _tetMesh->getCurVertexBuffer();
+		for (int i = 0; i < _tetMesh->GetTetNumber(); ++i)
+		{
+
+			Tetrahedron& t = _tetMesh->getTet(i);
+			MATRIX3 F;
+			VEC3F rowDs[3];
+			rowDs[0] = curVer[t.indices[1]] - curVer[t.indices[0]];
+			rowDs[1] = curVer[t.indices[2]] - curVer[t.indices[0]];
+			rowDs[2] = curVer[t.indices[3]] - curVer[t.indices[0]];
+
+			F.setZero();
+			F << rowDs[0][0], rowDs[1][0], rowDs[2][0],
+				rowDs[0][1], rowDs[1][1], rowDs[2][1],
+				rowDs[0][2], rowDs[1][2], rowDs[2][2];
+
+			MATRIX3& Bm = _tetMesh->getInverseDm(i);
+			MATRIX& pFpu = t._PFPu;
+			
+			for (int y = 0; y < 12; ++y)
+			{
+				int col = t.indices[y / 3] * 3 + y % 3;
+				VECTOR deltaF(9);
+				for (int z = 0; z < 9; ++z)
+					deltaF(z) = pFpu(z, y);
+				
+				MATRIX3 dF;
+				dF << deltaF(0), deltaF(3), deltaF(6),
+					  deltaF(1), deltaF(4), deltaF(7),
+					  deltaF(2), deltaF(5), deltaF(8);
+
+				MATRIX3 dP;
+				dP = firstPiolaKirchhoffDifferential(F, dF);
+				dP = -t.volume * dP * Bm.transpose();
+
+				VEC3F forces[4];
+				forces[1][0] = dP(0, 0);    forces[2][0] = dP(0, 1);	   forces[3][0] = dP(0, 2);
+				forces[1][1] = dP(1, 0);    forces[2][1] = dP(1, 1);	   forces[3][1] = dP(1, 2);
+				forces[1][2] = dP(2, 0);	forces[2][2] = dP(2, 1);	   forces[3][2] = dP(2, 2);
+
+				forces[0] = -forces[1] - forces[2] - forces[3];
+
+				for (int j = 0; j < 4; ++j)
+				{
+					int row = t.indices[j] * 3;
+					for (int k = 0; k < 3; ++k)
+					{
+						stiffnessMatrix.add(forces[j][k], row + k, col);
+					}
+				}
 			}
 		}
 	}

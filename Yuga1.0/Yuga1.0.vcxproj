@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="FULLIntegrator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TetMesh.cpp" />
   </ItemGroup>

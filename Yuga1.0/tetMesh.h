@@ -18,6 +18,7 @@ struct Tetrahedron {
 	double volume;			//volume 
 	//float plastic[6];		//plasticity values
 	VEC3F e1, e2, e3;	//edges
+	MATRIX _PFPu;
 	//glm::mat3 Re;			//Rotational warp of tetrahedron.
 	//glm::mat3 Ke[4][4];		//Stiffness element matrix
 	//glm::vec3 B[4];			//Jacobian of shapefunctions; B=SN =[d/dx  0     0 ][wn 0  0]
@@ -39,6 +40,7 @@ public:
 	TetMesh(const char * filename);
 	void ReadModelFromFile(const char * filename);
 	void init();
+	void computePFPu(MATRIX& _PFPu, MATRIX3& matInv);
 	// === misc queries ===
 	void computeMassMatrix();
 
@@ -67,7 +69,7 @@ public:
 	vector<VEC3F>& getOldPosition(){ return oldPosition; }
 	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
-	VECTOR& getDisplacement(){ return _movex; }
+
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
@@ -102,7 +104,7 @@ protected:
 	vector<VEC3F> oriCoordinates;
 	vector<VEC3F> curCoordinates;
 	vector<VEC3F> oldPosition;
-	VECTOR        _movex;
+
 
 	vector<Tetrahedron> tetrahedra;
 	vector<BoundaryTriangle> bTriangle;

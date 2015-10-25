@@ -13,7 +13,7 @@ protected:
 
 	VECTOR _InternalForce;
 	COO_MATRIX stiffnessMatrix;
-
+public:
 	Material(Real Young, Real Poisson)
 	{
 		_Young = Young;
@@ -22,6 +22,9 @@ protected:
 		_lambda = _Young * _Poisson / (1 + _Poisson) * (1 - _Poisson - _Poisson);
 	}
 	~Material() {}
+
+	VECTOR& getInternalForce(){ return _InternalForce; }
+	COO_MATRIX& getStiffnessMatrix(){ return stiffnessMatrix; }
 
 	virtual MATRIX3 firstPiolaKirchhoff(const MATRIX3 &F) = 0;
 	virtual VECTOR& computeInternalForce() = 0;

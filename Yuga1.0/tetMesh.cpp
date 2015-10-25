@@ -94,7 +94,7 @@ void TetMesh::ReadModelFromFile(const char *filename)
 
 		AddBTriangle(p0, p1, p2);
 	}
-	debug << bTriangle.size() << endl;
+	//debug << bTriangle.size() << endl;
 	//for (int i = 0; i < bTriangle.size(); i++)
 	//{
 	//	debug << bTriangle[i].indices[0] <<"  "<< bTriangle[i].indices[1] << "  " <<bTriangle[i].indices[2] << endl;
@@ -126,15 +126,21 @@ void TetMesh::init()
 
 		_InverDm[i].setZero();
 		_InverDm[i] << Dm[0][0], Dm[1][0], Dm[2][0],
-					   Dm[0][1], Dm[1][1], Dm[2][1],
-					   Dm[0][2], Dm[1][2], Dm[2][2];
+			Dm[0][1], Dm[1][1], Dm[2][1],
+			Dm[0][2], Dm[1][2], Dm[2][2];
 
 		_InverDm[i] = _InverDm[i].inverse();
 	}
 	oldPosition = curCoordinates;
 
-	_movex.resize(total_points * 3);
-	_movex.setZero();
+	//compute PFPu
+	for (int i = 0; i < total_tetrahedra; ++i)
+	{
+		computePFPu(tetrahedra[i]._PFPu, _InverDm[i]);
+		//debug << tetrahedra[i]._PFPu << endl;
+		//debug << "==========================================" << endl;
+	}
+
 }
 
 void TetMesh::computeElementMassMatrix(int el, double * massMatrix)
@@ -313,4 +319,132 @@ void TetMesh::computeMassMatrix()
 				_massMatrix.add(mass, getVertexIndex(i, j) * 3 + k, getVertexIndex(i, j) * 3 + k);
 			}	
 	}
+}
+
+void TetMesh::computePFPu(MATRIX& _PFPu, MATRIX3& matInv)//p(F)/p(x)
+{
+	const double m = matInv(0, 0);
+	const double n = matInv(0, 1);
+	const double o = matInv(0, 2);
+	const double p = matInv(1, 0);
+	const double q = matInv(1, 1);
+	const double r = matInv(1, 2);
+	const double s = matInv(2, 0);
+	const double t = matInv(2, 1);
+	const double u = matInv(2, 2);
+
+	const double t1 = -m - p - s;
+	const double t2 = -n - q - t;
+	const double t3 = -o - r - u;
+
+	_PFPu.resize(9, 12);
+	_PFPu.setZero();
+	_PFPu(0, 0) = t1;                  //t1  0   0   m    0    0   p   0   0   s   0   0
+	_PFPu(0, 1) = 0.0;                 //0   t1  0   0    m    0   0   p   0   0   s   0
+	_PFPu(0, 2) = 0.0;                 //0   0   t1  0    0    m   0   0   p   0   0   s
+	_PFPu(0, 3) = m;                   //t2  0   0   n    0    0   q   0   0   t   0   0   
+	_PFPu(0, 4) = 0.0;                 //0   t2  0   0    n    0   0   q   0   0   t   0
+	_PFPu(0, 5) = 0.0;                 //0   0   t2  0    0    n   0   0   q   0   0   t
+	_PFPu(0, 6) = p;                   //t3  0   0   o    0    0   r   0   0   u   0   0
+	_PFPu(0, 7) = 0.0;                 //0   t3  0   0    o    0   0   r   0   0   u   0
+	_PFPu(0, 8) = 0.0;                 //0   0   t3  0    0    o   0   0   r   0   0   u
+	_PFPu(0, 9) = s;
+	_PFPu(0, 10) = 0.0;
+	_PFPu(0, 11) = 0.0;
+	_PFPu(1, 0) = 0.0;
+	_PFPu(1, 1) = t1;
+	_PFPu(1, 2) = 0.0;
+	_PFPu(1, 3) = 0.0;
+	_PFPu(1, 4) = m;
+	_PFPu(1, 5) = 0.0;
+	_PFPu(1, 6) = 0.0;
+	_PFPu(1, 7) = p;
+	_PFPu(1, 8) = 0.0;
+	_PFPu(1, 9) = 0.0;
+	_PFPu(1, 10) = s;
+	_PFPu(1, 11) = 0.0;
+	_PFPu(2, 0) = 0.0;
+	_PFPu(2, 1) = 0.0;
+	_PFPu(2, 2) = t1;
+	_PFPu(2, 3) = 0.0;
+	_PFPu(2, 4) = 0.0;
+	_PFPu(2, 5) = m;
+	_PFPu(2, 6) = 0.0;
+	_PFPu(2, 7) = 0.0;
+	_PFPu(2, 8) = p;
+	_PFPu(2, 9) = 0.0;
+	_PFPu(2, 10) = 0.0;
+	_PFPu(2, 11) = s;
+	_PFPu(3, 0) = t2;
+	_PFPu(3, 1) = 0.0;
+	_PFPu(3, 2) = 0.0;
+	_PFPu(3, 3) = n;
+	_PFPu(3, 4) = 0.0;
+	_PFPu(3, 5) = 0.0;
+	_PFPu(3, 6) = q;
+	_PFPu(3, 7) = 0.0;
+	_PFPu(3, 8) = 0.0;
+	_PFPu(3, 9) = t;
+	_PFPu(3, 10) = 0.0;
+	_PFPu(3, 11) = 0.0;
+	_PFPu(4, 0) = 0.0;
+	_PFPu(4, 1) = t2;
+	_PFPu(4, 2) = 0.0;
+	_PFPu(4, 3) = 0.0;
+	_PFPu(4, 4) = n;
+	_PFPu(4, 5) = 0.0;
+	_PFPu(4, 6) = 0.0;
+	_PFPu(4, 7) = q;
+	_PFPu(4, 8) = 0.0;
+	_PFPu(4, 9) = 0.0;
+	_PFPu(4, 10) = t;
+	_PFPu(4, 11) = 0.0;
+	_PFPu(5, 0) = 0.0;
+	_PFPu(5, 1) = 0.0;
+	_PFPu(5, 2) = t2;
+	_PFPu(5, 3) = 0.0;
+	_PFPu(5, 4) = 0.0;
+	_PFPu(5, 5) = n;
+	_PFPu(5, 6) = 0.0;
+	_PFPu(5, 7) = 0.0;
+	_PFPu(5, 8) = q;
+	_PFPu(5, 9) = 0.0;
+	_PFPu(5, 10) = 0.0;
+	_PFPu(5, 11) = t;
+	_PFPu(6, 0) = t3;
+	_PFPu(6, 1) = 0.0;
+	_PFPu(6, 2) = 0.0;
+	_PFPu(6, 3) = o;
+	_PFPu(6, 4) = 0.0;
+	_PFPu(6, 5) = 0.0;
+	_PFPu(6, 6) = r;
+	_PFPu(6, 7) = 0.0;
+	_PFPu(6, 8) = 0.0;
+	_PFPu(6, 9) = u;
+	_PFPu(6, 10) = 0.0;
+	_PFPu(6, 11) = 0.0;
+	_PFPu(7, 0) = 0.0;
+	_PFPu(7, 1) = t3;
+	_PFPu(7, 2) = 0.0;
+	_PFPu(7, 3) = 0.0;
+	_PFPu(7, 4) = o;
+	_PFPu(7, 5) = 0.0;
+	_PFPu(7, 6) = 0.0;
+	_PFPu(7, 7) = r;
+	_PFPu(7, 8) = 0.0;
+	_PFPu(7, 9) = 0.0;
+	_PFPu(7, 10) = u;
+	_PFPu(7, 11) = 0.0;
+	_PFPu(8, 0) = 0.0;
+	_PFPu(8, 1) = 0.0;
+	_PFPu(8, 2) = t3;
+	_PFPu(8, 3) = 0.0;
+	_PFPu(8, 4) = 0.0;
+	_PFPu(8, 5) = o;
+	_PFPu(8, 6) = 0.0;
+	_PFPu(8, 7) = 0.0;
+	_PFPu(8, 8) = r;
+	_PFPu(8, 9) = 0.0;
+	_PFPu(8, 10) = 0.0;
+	_PFPu(8, 11) = u;
 }
