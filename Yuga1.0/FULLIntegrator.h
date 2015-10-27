@@ -4,41 +4,45 @@
 #include "Material.h"
 #include "COO_MATRIX.h"
 #include "MaterialLinearElasticity.h"
+#include "JACOBI_PRECONDITIONER.h"
+#include "CONJUGATE_GRADIENT.h"
 class FullIntegrator
 {
 protected:
 	VECTOR q;//diceplacement
 	VECTOR qvel;//current velocities of deformation amplitudes
-	VECTOR qaccel;//current acceleration
-	VECTOR qresidul, qdelta;//aux integration variables
+	//VECTOR qaccel;//current acceleration
+	VECTOR qresidual, qdelta;//aux integration variables
 	VECTOR q_old;//variables in previous time-step
 	VECTOR qvel_old;
-	VECTOR qaccel_old;
+	//VECTOR qaccel_old;
+	VECTOR deltaV;
+
 
 	VECTOR _internalForces;
 	VECTOR _externalForces;
 
-	COO_MATRIX dampingMatrix;
+	COO_MATRIX _massesMatrix;
+	COO_MATRIX _dampingMatrix;
 	COO_MATRIX _stiffnessMatrix;
-	COO_MATRIX systemMatrix;
+	COO_MATRIX _systemMatrix;
 	//these two store the damping parameters
-	double dampingMassCoef;
-	double dampingStiffnessCoef;
+	double _dampingMassCoef;
+	double _dampingStiffnessCoef;
 
-	double timestep;
+	double _timestep;
+	double _vDofs;
+
+	int _maxIterations;
+	double _epsilon;
 
 	TetMesh *_tetMesh;
 	Material *_material;
 public:
-	FullIntegrator(TetMesh *tetMesh)
-	{ 
-		_tetMesh = tetMesh; 
-		_material = new MaterialLinearElasticity(1e7, 0.4);
-		_internalForces = _material->getInternalForce();
-		_stiffnessMatrix = _material->getStiffnessMatrix();
-	}
+	FullIntegrator(TetMesh *tetMesh, double dampingMassCoef, double dampingStiffnessCoef, int maxIterations, double timestep);
 	~FullIntegrator(){}
 
-	virtual void timeStepSystem();
+	virtual void SetupSystemMatrix(int numIter);
+	virtual void DoTimeStep();
 };
 #endif

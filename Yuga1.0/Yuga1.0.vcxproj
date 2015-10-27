@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="CONJUGATE_GRADIENT.h" />
     <ClInclude Include="COO_MATRIX.h" />
     <ClInclude Include="FULLIntegrator.h" />
     <ClInclude Include="Material.h" />

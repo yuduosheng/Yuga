@@ -392,6 +392,55 @@ public:
 			cout << _matrix[i].row() << " " << _matrix[i].col() << " " << _matrix[i].value() << endl;
 		}
 	}
+
+	void multiplyVector(VECTOR& input, VECTOR& output)
+	{
+		assert(this->cols() == input.size());
+
+		output.setZero();
+
+		const vector<TRIPLET>& mat = this->matrix();
+
+		for (unsigned int x = 0; x < mat.size(); x++){
+			output[mat[x].row()] += mat[x].value() * input[mat[x].col()];
+		}
+	}
+	void multiplyVectorAdd(VECTOR& input, VECTOR& output)
+	{
+		assert(this->cols() == input.size());
+
+		const vector<TRIPLET>& mat = this->matrix();
+
+		for (unsigned int x = 0; x < mat.size(); x++){
+			output[mat[x].row()] += mat[x].value() * input[mat[x].col()];
+		}
+	}
+
+	void plus(const COO_MATRIX& A){
+		// const 
+		assert(_cols == A.cols() && _rows = A.rows());
+		const vector<TRIPLET>& triplet = A.matrix();
+		for (int i = 0; i < triplet.size(); ++i)
+		{
+			this->add(triplet[i].value(), triplet[i].row(), triplet[i].col());
+		}
+	}
+
+	VECTOR& getDiag()
+	{
+		return _diag;
+	}
+	void updateDiag()
+	{
+		_diag.setZero();
+		for (int i = 0; i < _matrix.size(); ++i)
+		{
+			if (_matrix[i].row() == _matrix[i].col())
+			{
+				_diag[_matrix[i].row()] = _matrix[i].value();
+			}
+		}
+	}
 protected:
 	vector<TRIPLET> _matrix;
 	VECTOR _diag;

@@ -39,6 +39,9 @@
     <ClInclude Include="COO_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CONJUGATE_GRADIENT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">

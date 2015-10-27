@@ -391,6 +391,29 @@ public:
 			cout << _matrix[i].row() << " " << _matrix[i].col() << " " << _matrix[i].value() << endl;
 		}
 	}
+
+	void multiplyVector(VECTOR& input, VECTOR& output)
+	{
+		assert(this->cols() == input.size());
+
+		output.setZero();
+
+		const vector<TRIPLET>& mat = this->matrix();
+
+		for (unsigned int x = 0; x < mat.size(); x++){
+			output[mat[x].row()] += mat[x].value() * input[mat[x].col()];
+		}
+	}
+	void multiplyVectorAdd(VECTOR& input, VECTOR& output)
+	{
+		assert(this->cols() == input.size());
+
+		const vector<TRIPLET>& mat = this->matrix();
+
+		for (unsigned int x = 0; x < mat.size(); x++){
+			output[mat[x].row()] += mat[x].value() * input[mat[x].col()];
+		}
+	}
 protected:
 	vector<TRIPLET> _matrix;
 	VECTOR _diag;

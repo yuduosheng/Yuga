@@ -69,7 +69,7 @@ public:
 	vector<VEC3F>& getOldPosition(){ return oldPosition; }
 	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
-
+	COO_MATRIX& getMassesMatrix(){ return _massMatrix; }
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
