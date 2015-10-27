@@ -90,6 +90,19 @@ public:
 
 	void setScaleFactor(float x)                          { mScale = glm::scale(glm::mat4(), glm::vec3(x)); }
 	void setWH(float w, float h)                          { mWidth = w, mHeight = h; }
+
+	void computeAxis()
+	{
+		zAxis = mCameraPosition - mFocus;
+		zAxis = glm::normalize(zAxis);
+		xAxis = glm::cross(zAxis, mUp);
+		xAxis = glm::normalize(xAxis);
+		yAxis = glm::cross(zAxis, xAxis);
+		yAxis = glm::normalize(yAxis);
+	}
+
+	void camara2worldVector(double x, double y, double z, double *w);
+
 private:
 	glm::mat4 mScale;
 
@@ -98,6 +111,8 @@ private:
 
 	glm::quat RotationUp;//rotate quaternion
 	glm::quat RotationRight;
+
+	glm::vec3 xAxis, yAxis, zAxis;
 };
 
 #endif 

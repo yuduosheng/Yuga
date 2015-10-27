@@ -1,6 +1,7 @@
 #include "App.h"
 #include "camera.h"
 #include "tetMesh.h"
+#include "FULLIntegrator.h"
 
 namespace shader
 {
@@ -88,9 +89,14 @@ private:
 	GLuint                  v_matrix;
 	GLuint                  l_position;
 
-	TetMesh                 dino;
-
+	TetMesh                 *modelTetMesh;
+	FullIntegrator          *integrator;
 	bool					isFill;
+
+	int dragStartX, dragStartY;
+	int pulledVertex;
+
+	VEC3F vertexForce;
 };
 
 int main(void)
@@ -104,10 +110,10 @@ int main(void)
 	return 0;
 }
 
-Test::Test() : App(), camera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 2.0f, 0.0f), mWidth, mHeight), dino("capsule2.1"),
+Test::Test() : App(), camera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 2.0f, 0.0f), mWidth, mHeight),
 isFill(true)
 {
-
+	pulledVertex = -1;
 }
 
 Test::~Test()
@@ -132,6 +138,11 @@ bool Test::Init()
 	glBindVertexArray(vao);
 	buildShader();
 	//buildGeometryBuffers();
+	modelTetMesh = new TetMesh("capsule.2");
+	integrator = new FullIntegrator(modelTetMesh);
+
+	modelTetMesh->setCurPosition(integrator->getQ());
+
 	return true;
 }
 
@@ -170,10 +181,18 @@ void Test::UpdateScene()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	if (pulledVertex != -1)
+	{
+		integrator->resetExternalForce();
+		integrator->addVertexForce(pulledVertex, vertexForce);
+	}
+
+	integrator->DoTimeStep();
 }
 void Test::Rendering()
 {
-	dino.RenderModel();
+	modelTetMesh->RenderModel();
 
 	/* Draw a triangle 
 	glBegin(GL_TRIANGLES);
@@ -313,6 +332,19 @@ void Test::onMouseMove(GLFWwindow* window, double xd, double yd)
 		camera.SetCurMousePosition(x, y);
 		camera.SetRotation();
 		camera.SetPreMousePosition(x, y);
+
+		if (pulledVertex != -1)
+		{
+			double forceX = (x - dragStartX);
+			double forceY = -(y - dragStartY);
+
+			double externalForce[3];
+			camera.camara2worldVector(forceX, forceY, 0, externalForce);
+
+			vertexForce[0] = externalForce[0];
+			vertexForce[1] = externalForce[1];
+			vertexForce[2] = externalForce[2];
+		}
 	}
 
 }
@@ -322,13 +354,52 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 
 	if ((button == GLFW_MOUSE_BUTTON_1) && (action == GLFW_PRESS))
 	{
-		camera.SetMouseLButtonStat(true);
-		glfwGetCursorPos(window, &xd, &yd);
-		camera.initMousePosition(xd, yd);
+		GLdouble model[16];
+		glGetDoublev(GL_MODELVIEW_MATRIX, model);
+
+		GLdouble proj[16];
+		glGetDoublev(GL_PROJECTION_MATRIX, proj);
+
+		GLint view[4];
+		glGetIntegerv(GL_VIEWPORT, view);
+
+		int winX = xd;
+		int winY = view[3] - 1 - yd;
+
+		float zValue;
+		glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zValue);
+
+		GLubyte stencilValue;
+		glReadPixels(winX, winY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &stencilValue);
+		if (stencilValue == 1)
+		{
+			GLdouble worldX, worldY, worldZ;
+			gluUnProject(winX, winY, zValue, model, proj, view, &worldX, &worldY, &worldZ);
+
+			dragStartX = xd;
+			dragStartY = yd;
+			VEC3F pos(worldX, worldY, worldZ);
+
+			pulledVertex = modelTetMesh->getClosestVertex(pos);
+
+			printf("Clicked on vertex: %d (0-indexed)\n", pulledVertex);
+		}
+		else
+		{
+			printf("Clicked on empty stencil: %d.\n", stencilValue);
+		}
+
+		if (pulledVertex == -1)
+		{
+			camera.SetMouseLButtonStat(true);
+			glfwGetCursorPos(window, &xd, &yd);
+			camera.initMousePosition(xd, yd);
+		}
 	}
 	else if ((button == GLFW_MOUSE_BUTTON_1) && (action == GLFW_RELEASE))
 	{
 		camera.SetMouseLButtonStat(false);
+		pulledVertex = -1;
 	}
 
 }

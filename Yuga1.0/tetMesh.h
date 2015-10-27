@@ -66,12 +66,14 @@ public:
 	int GetTetNumber(){ return total_tetrahedra; }
 	int getVertexIndex(int el, int ver);	
 	vector<VEC3F>& getCurVertexBuffer(){ return curCoordinates; }
-	vector<VEC3F>& getOldPosition(){ return oldPosition; }
+	vector<VEC3F>& getOriVertexBuffer(){ return oriCoordinates; }
 	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
 	COO_MATRIX& getMassesMatrix(){ return _massMatrix; }
 	//get current position VECTOR;
 	void getCurPosition(VECTOR &q);
+
+	int getClosestVertex(VEC3F pos);
 	//=====set function=====
 	void setCurPosition(VECTOR &q);
 	
@@ -108,8 +110,7 @@ protected:
 protected:
 	vector<VEC3F> oriCoordinates;
 	vector<VEC3F> curCoordinates;
-	vector<VEC3F> oldPosition;
-
+	//vector<int>   surfaceVetexIndex;
 
 	vector<Tetrahedron> tetrahedra;
 	vector<BoundaryTriangle> bTriangle;

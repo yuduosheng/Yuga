@@ -8,8 +8,9 @@ class MaterialLinearElasticity : public Material
 private:
 	TetMesh *_tetMesh;
 public:
-	MaterialLinearElasticity(Real Young, Real Poisson) : Material(Young, Poisson)
+	MaterialLinearElasticity(TetMesh *tetMesh_, Real Young, Real Poisson) : Material(Young, Poisson)
 	{
+		_tetMesh = tetMesh_;
 		_InternalForce.resize(_tetMesh->GetVetexNumber() * 3);
 	};
 	~MaterialLinearElasticity(){};
@@ -23,7 +24,7 @@ public:
 		return _mu * (dF + dF.transpose()) + _lambda * (dF - MATRIX3::Identity()) * MATRIX3::Identity();
 	}
 
-	VECTOR& computeInternalForce()
+	void computeInternalForce(VECTOR& _InternalForce)
 	{
 		_InternalForce.setZero();
 
@@ -137,10 +138,10 @@ public:
 	}
 	*/
 	//stiffness matrix
-	COO_MATRIX& computeStiffnessMatrix()
+	void computeStiffnessMatrix(COO_MATRIX& _stiffnessMatrix)
 	{
-		stiffnessMatrix.resize(_tetMesh->GetVetexNumber() * 3, _tetMesh->GetVetexNumber() * 3);
-		vector<VEC3F>& curVer = _tetMesh->getCurVertexBuffer();
+		_stiffnessMatrix.resize(_tetMesh->GetVetexNumber() * 3, _tetMesh->GetVetexNumber() * 3);
+		vector<VEC3F>& curVer = _tetMesh->getOriVertexBuffer();
 		for (int i = 0; i < _tetMesh->GetTetNumber(); ++i)
 		{
 
@@ -187,7 +188,7 @@ public:
 					int row = t.indices[j] * 3;
 					for (int k = 0; k < 3; ++k)
 					{
-						stiffnessMatrix.add(forces[j][k], row + k, col);
+						_stiffnessMatrix.add(forces[j][k], row + k, col);
 					}
 				}
 			}

@@ -11,8 +11,6 @@ protected:
 	Real _mu;
 	Real _lambda;
 
-	VECTOR _InternalForce;
-	COO_MATRIX stiffnessMatrix;
 public:
 	Material(Real Young, Real Poisson)
 	{
@@ -23,12 +21,9 @@ public:
 	}
 	~Material() {}
 
-	VECTOR& getInternalForce(){ return _InternalForce; }
-	COO_MATRIX& getStiffnessMatrix(){ return stiffnessMatrix; }
-
 	virtual MATRIX3 firstPiolaKirchhoff(const MATRIX3 &F) = 0;
-	virtual VECTOR& computeInternalForce() = 0;
-	virtual COO_MATRIX& computeStiffnessMatrix() = 0;
+	virtual void computeInternalForce(VECTOR& _internalForce) = 0;
+	virtual void computeStiffnessMatrix(COO_MATRIX& _stiffnessMatrix) = 0;
 };
 
 #endif

@@ -317,7 +317,25 @@ void TetMesh::getCurPosition(VECTOR &q)
     	q.segment<3>(3 * i) = curCoordinates[i];
     }
 }
+int TetMesh::getClosestVertex(VEC3F pos)
+{
+	// linear scan
+	double closestDist = DBL_MAX;
+	int closestVertex = -1;
 
+	for (int i = 0; i < total_points; i++)
+	{
+		VEC3F & vertexPosition = curCoordinates[i];
+		double dist = (pos - vertexPosition).norm();
+		if (dist < closestDist)
+		{
+			closestDist = dist;
+			closestVertex = i;
+		}
+	}
+
+	return closestVertex;
+}
 void TetMesh::computeMassMatrix()
 {
 	//lumped mass

@@ -112,6 +112,8 @@ ObjectCamera::ObjectCamera(glm::vec3 cPosition, glm::vec3 fPosition, float wWidt
 	mView = glm::lookAt(mCameraPosition, mFocus, mUp);
 	SetProj(45.0f, (float)wWidth / wHeight, 0.1f, 100.f);
 
+	computeAxis();
+
 	mbMouseLButtonDown = false;
 	mbMouseWheelRoll = false;
 	mbMouseRButtonDown = false;
@@ -179,4 +181,12 @@ void ObjectCamera::SetRotation()
 	glm::mat4 rotateM = glm::rotate(val*100, axis);
 
 	mWorld = rotateM * mWorld;
+}
+
+void ObjectCamera::camara2worldVector(double x, double y, double z, double *w)
+{
+	// w = c0 * xAxis + c1 * yAxis + c2 * zAxis
+	w[0] = (x * xAxis[0] + y * yAxis[0] + z * zAxis[0]);
+	w[1] = (x * xAxis[1] + y * yAxis[1] + z * zAxis[1]);
+	w[2] = (x * xAxis[2] + y * yAxis[2] + z * zAxis[2]);
 }
