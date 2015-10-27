@@ -303,6 +303,21 @@ void TetMesh::RenderModel()
 	*/
 }
 
+void TetMesh::setCurPosition(VECTOR & q)
+{
+	for (int i = 0; i < total_points; i++)
+    {
+    	curCoordinates[i] = q.segment<3>(3 * i);
+    }
+}
+void TetMesh::getCurPosition(VECTOR &q)
+{
+	for (int i = 0; i < total_points; i++)
+    {
+    	q.segment<3>(3 * i) = curCoordinates[i];
+    }
+}
+
 void TetMesh::computeMassMatrix()
 {
 	//lumped mass

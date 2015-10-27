@@ -64,12 +64,17 @@ public:
 	//====member queries====
 	int GetVetexNumber(){ return total_points; }
 	int GetTetNumber(){ return total_tetrahedra; }
-	int getVertexIndex(int el, int ver);
+	int getVertexIndex(int el, int ver);	
 	vector<VEC3F>& getCurVertexBuffer(){ return curCoordinates; }
 	vector<VEC3F>& getOldPosition(){ return oldPosition; }
 	Tetrahedron& getTet(int index){ return tetrahedra[index]; }
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
 	COO_MATRIX& getMassesMatrix(){ return _massMatrix; }
+	//get current position VECTOR;
+	void getCurPosition(VECTOR &q);
+	//=====set function=====
+	void setCurPosition(VECTOR &q);
+	
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)
