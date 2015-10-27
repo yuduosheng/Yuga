@@ -13,19 +13,17 @@ FullIntegrator::FullIntegrator(TetMesh *tetMesh, double dampingMassCoef = 0.25, 
 	_dampingStiffnessCoef = dampingStiffnessCoef;
 	_maxIterations = maxIterations;
 	_timestep = timestep;
+	
+	jacobiPreconditionedCGSolver = new CGSolver(_stiffnessMatrix);
 }
 
 void FullIntegrator::SetupSystemMatrix(int numIter)
 {
-
-	q_old = q;
-	qvel_old = qvel;
-
 	if (numIter != 0)
 	{
 		deltaV = q_old - q;
 
-		_stiffnessMatrix.multiplyVector(deltaV, qresidual);//qresidul = _stiffnessMatrix * (q_o - q)
+		_stiffnessMatrix.multiplyVector(deltaV, qresidual);//qresidual = _stiffnessMatrix * (q_o - q)
 	}
 	// build effective stiffness: 
 	// Keff = M + h D + h^2 * K
@@ -35,7 +33,7 @@ void FullIntegrator::SetupSystemMatrix(int numIter)
 
 	_stiffnessMatrix *= _timestep;
 	_stiffnessMatrix.plus(_dampingMatrix);
-	_stiffnessMatrix.multiplyVectorAdd(qvel, qresidual);//qresidul += (h*K + D)qdot
+	_stiffnessMatrix.multiplyVectorAdd(qvel, qresidual);//qresidual += (h*K + D)qdot
 	_stiffnessMatrix *= _timestep; // h^2 * K + h * D
 	_stiffnessMatrix.plus(_massesMatrix);
 
@@ -53,6 +51,50 @@ void FullIntegrator::SetupSystemMatrix(int numIter)
 
 		_massesMatrix.multiplyVectorAdd(deltaV, qresidual);
 	}
+}
 
-	qdelta = qresidual;
+void FullIntegrator::DoTimeStep()
+{
+	int numIter = 0;
+
+    double error0 = 0; // error after the first step
+    double errorQuotient;
+
+    // store current amplitudes and set initial guesses for qaccel, qvel
+    q_old = q; 
+    qvel_old = qvel;
+	
+	do
+	{
+		SetupSystemMatrix(numIter)
+		
+		double error = 0.0;
+   		for(int i = 0; i < _vDofs; i++)
+      		error += qresidual * qresidual[i];
+			  
+		    // on the first iteration, compute initial error
+      if (numIter == 0) 
+  	  {
+     	 error0 = error;
+     	 errorQuotient = 1.0;
+      }
+      else
+   	  {
+    	  // error divided by the initial error, before performing this iteration
+    	  errorQuotient = error / error0; 
+      }
+
+      if (errorQuotient < epsilon * epsilon)
+    	  break;
+	  //solve
+	  jacobiPreconditionedCGSolver->solvePCG(qresidual, deltaV);
+	  //update state
+	  for(int i=0; i<r; i++)
+      {
+          qvel[i] += deltaV[i];
+          q[i] = q_1[i] + _timestep * qvel[i];
+      }	  
+	  numIter++;
+	}
+   	while(numIter < _maxIterations)
 }

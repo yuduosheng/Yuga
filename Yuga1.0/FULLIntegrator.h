@@ -4,19 +4,18 @@
 #include "Material.h"
 #include "COO_MATRIX.h"
 #include "MaterialLinearElasticity.h"
-#include "JACOBI_PRECONDITIONER.h"
 #include "CONJUGATE_GRADIENT.h"
+typedef CONJUGATE_GRADIENT CGSlover;
 class FullIntegrator
 {
 protected:
 	VECTOR q;//diceplacement
 	VECTOR qvel;//current velocities of deformation amplitudes
 	//VECTOR qaccel;//current acceleration
-	VECTOR qresidual, qdelta;//aux integration variables
+	VECTOR qresidual, deltaV;//aux integration variables
 	VECTOR q_old;//variables in previous time-step
 	VECTOR qvel_old;
 	//VECTOR qaccel_old;
-	VECTOR deltaV;
 
 
 	VECTOR _internalForces;
@@ -25,7 +24,8 @@ protected:
 	COO_MATRIX _massesMatrix;
 	COO_MATRIX _dampingMatrix;
 	COO_MATRIX _stiffnessMatrix;
-	COO_MATRIX _systemMatrix;
+	
+	CGSlover *jacobiPreconditionedCGSolver;
 	//these two store the damping parameters
 	double _dampingMassCoef;
 	double _dampingStiffnessCoef;
