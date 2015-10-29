@@ -5,7 +5,9 @@
 #include "COO_MATRIX.h"
 #include "MaterialLinearElasticity.h"
 #include "CONJUGATE_GRADIENT.h"
+
 typedef CONJUGATE_GRADIENT CGSolver;
+
 class FullIntegrator
 {
 protected:
@@ -24,7 +26,8 @@ protected:
 	COO_MATRIX _massesMatrix;
 	COO_MATRIX _dampingMatrix;
 	COO_MATRIX _stiffnessMatrix;
-	
+	COO_MATRIX _systemMatrix;
+
 	CGSolver *jacobiPreconditionedCGSolver;
 	//these two store the damping parameters
 	double _dampingMassCoef;
@@ -39,8 +42,14 @@ protected:
 	TetMesh *_tetMesh;
 	Material *_material;
 public:
-	FullIntegrator(TetMesh *tetMesh, double dampingMassCoef = 0.25, double dampingStiffnessCoef = 0.5, int maxIterations = 5, double timestep = 1.0f / 30.0f);
-	~FullIntegrator(){}
+	FullIntegrator(TetMesh *tetMesh, double dampingMassCoef = 0.25f, double dampingStiffnessCoef = 0.5f, int maxIterations = 5, double timestep = 1.0f / 30.0f);
+	~FullIntegrator()
+	{		
+
+		if (_material)
+			delete _material;
+
+	}
 
 	virtual void SetupSystemMatrix(int numIter);
 	virtual void DoTimeStep();

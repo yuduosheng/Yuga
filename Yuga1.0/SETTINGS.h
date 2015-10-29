@@ -17,10 +17,6 @@ using namespace std;
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define USING_OSX __APPLE__
-
-#define USING_GLVU 1
-
 // select single or double precision
 #define DOUBLE_PRECISION 1
 

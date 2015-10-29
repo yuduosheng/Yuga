@@ -24,6 +24,7 @@ public:
 	virtual MATRIX3 firstPiolaKirchhoff(const MATRIX3 &F) = 0;
 	virtual void computeInternalForce(VECTOR& _internalForce) = 0;
 	virtual void computeStiffnessMatrix(COO_MATRIX& _stiffnessMatrix) = 0;
+	virtual void computeElementStiffnessMatrix(int index, COO_MATRIX& _stiffness) = 0;
 };
 
 #endif

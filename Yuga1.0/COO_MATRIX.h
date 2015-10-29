@@ -408,17 +408,21 @@ public:
 	void multiplyVectorAdd(VECTOR& input, VECTOR& output)
 	{
 		assert(this->cols() == input.size());
-
+		
 		const vector<TRIPLET>& mat = this->matrix();
-
-		for (unsigned int x = 0; x < mat.size(); x++){
+		//cout << _rows << " " << _cols << endl;
+		//cout << input.size() << " " << output.size() << endl;
+		//cout << "=============" << endl;
+		for (unsigned int x = 0; x < mat.size(); x++)
+		{
+			//cout << mat[x].row() << " " << mat[x].col() << endl;
 			output[mat[x].row()] += mat[x].value() * input[mat[x].col()];
 		}
 	}
 
 	void plus(const COO_MATRIX& A){
 		// const 
-		assert(_cols == A.cols() && _rows = A.rows());
+		assert(_cols == A.cols() && _rows == A.rows());
 		const vector<TRIPLET>& triplet = A.matrix();
 		for (int i = 0; i < triplet.size(); ++i)
 		{
@@ -428,6 +432,7 @@ public:
 
 	VECTOR& getDiag()
 	{
+		updateDiag();
 		return _diag;
 	}
 	void updateDiag()
@@ -440,6 +445,25 @@ public:
 				_diag[_matrix[i].row()] = _matrix[i].value();
 			}
 		}
+	}
+	void mutilplyByX(const Real& coef)
+	{
+		for (int i = 0; i < _matrix.size(); ++i)
+		{
+			_matrix[i].value() *= coef;
+		}
+	}
+	COO_MATRIX operator*(const Real& coef)
+	{
+		COO_MATRIX a(*this);
+		a.mutilplyByX(coef);
+		return a;
+	}
+	COO_MATRIX operator+(const COO_MATRIX& other)
+	{
+		COO_MATRIX a(*this);
+		a.plus(other);
+		return a;
 	}
 protected:
 	vector<TRIPLET> _matrix;

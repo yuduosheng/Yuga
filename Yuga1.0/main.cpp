@@ -2,7 +2,8 @@
 #include "camera.h"
 #include "tetMesh.h"
 #include "FULLIntegrator.h"
-
+#include "ProjectAndUnProject.h"
+#include "TIMING_BREAKDOWN.h"
 namespace shader
 {
 	GLuint loadShader(const char * filename, GLenum shader_type, bool check_errors)
@@ -123,6 +124,11 @@ Test::~Test()
 	// Cleanup VBO and shader
 	glDeleteProgram(program);
 	glDeleteVertexArrays(1, &vao);
+	if (modelTetMesh)
+		delete modelTetMesh;
+	if (integrator)
+		delete integrator;
+
 }
 
 bool Test::Init()
@@ -138,10 +144,8 @@ bool Test::Init()
 	glBindVertexArray(vao);
 	buildShader();
 	//buildGeometryBuffers();
-	modelTetMesh = new TetMesh("capsule.2");
+	modelTetMesh = new TetMesh("capsule2.1");
 	integrator = new FullIntegrator(modelTetMesh);
-
-	modelTetMesh->setCurPosition(integrator->getQ());
 
 	return true;
 }
@@ -158,6 +162,7 @@ void Test::onResize(GLFWwindow* window, int nw, int nh)
 
 void Test::UpdateScene()
 {
+	TIMING_BREAKDOWN::startFrame();
 	static const GLfloat background[] = { 0.1f, 0.1f, 0.1f, 0.1f };
 	static const GLfloat one = 1.0f;
 
@@ -189,6 +194,7 @@ void Test::UpdateScene()
 	}
 
 	integrator->DoTimeStep();
+	TIMING_BREAKDOWN::endFrame();
 }
 void Test::Rendering()
 {
@@ -363,8 +369,13 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 		GLint view[4];
 		glGetIntegerv(GL_VIEWPORT, view);
 
+		glfwGetCursorPos(window, &xd, &yd);
+
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+
 		int winX = xd;
-		int winY = view[3] - 1 - yd;
+		int winY = height - yd;
 
 		float zValue;
 		glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zValue);
@@ -373,12 +384,12 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 		glReadPixels(winX, winY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &stencilValue);
 		if (stencilValue == 1)
 		{
-			GLdouble worldX, worldY, worldZ;
-			gluUnProject(winX, winY, zValue, model, proj, view, &worldX, &worldY, &worldZ);
+			GLdouble worldCoor[3];
+			_glUnProject(winX, winY, zValue, model, proj, view, worldCoor);
 
 			dragStartX = xd;
 			dragStartY = yd;
-			VEC3F pos(worldX, worldY, worldZ);
+			VEC3F pos(worldCoor[0], worldCoor[1], worldCoor[2]);
 
 			pulledVertex = modelTetMesh->getClosestVertex(pos);
 
@@ -388,7 +399,6 @@ void Test::onMouseButton(GLFWwindow* window, int button, int action, int mods)
 		{
 			printf("Clicked on empty stencil: %d.\n", stencilValue);
 		}
-
 		if (pulledVertex == -1)
 		{
 			camera.SetMouseLButtonStat(true);
@@ -410,5 +420,8 @@ void Test::onKey(GLFWwindow* window, int key, int scancode, int action, int mods
 	{
 		isFill = !isFill;
 	}
-
+	if ((key == GLFW_KEY_T) && (action == GLFW_PRESS))
+	{
+		TIMING_BREAKDOWN::printTimingBreakdown();
+	}
 }

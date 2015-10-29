@@ -71,12 +71,46 @@ public:
 	MATRIX3& getInverseDm(int index){ return _InverDm[index]; }
 	COO_MATRIX& getMassesMatrix(){ return _massMatrix; }
 	//get current position VECTOR;
-	void getCurPosition(VECTOR &q);
+	void getDisplacement(VECTOR &q);
 
 	int getClosestVertex(VEC3F pos);
 	//=====set function=====
 	void setCurPosition(VECTOR &q);
-	
+	/*
+	inline void inv(MATRIX3& mat)
+	{
+		double A[9];
+		A[0] = mat(0, 0); A[1] = mat(0, 1); A[2] = mat(0, 2);
+		A[3] = mat(1, 0); A[4] = mat(1, 1); A[5] = mat(1, 2);
+		A[6] = mat(2, 0); A[7] = mat(2, 1); A[8] = mat(2, 2);
+
+		double AInv[9];
+		inverse3x3(A, AInv);
+
+		mat(0, 0) = AInv[0]; mat(0, 1) = AInv[1]; mat(0, 2) = AInv[2];
+		mat(1, 0) = AInv[3]; mat(1, 1) = AInv[4]; mat(1, 2) = AInv[5];
+		mat(2, 0) = AInv[6]; mat(2, 1) = AInv[7]; mat(2, 2) = AInv[8];
+	}
+
+	inline void inverse3x3(const double * A, double * AInv)
+	{
+		// converted to C from Mathematica output   
+		AInv[0] = -A[5] * A[7] + A[4] * A[8];
+		AInv[1] = A[2] * A[7] - A[1] * A[8];
+		AInv[2] = -A[2] * A[4] + A[1] * A[5];
+		AInv[3] = A[5] * A[6] - A[3] * A[8];
+		AInv[4] = -A[2] * A[6] + A[0] * A[8];
+		AInv[5] = A[2] * A[3] - A[0] * A[5];
+		AInv[6] = -A[4] * A[6] + A[3] * A[7];
+		AInv[7] = A[1] * A[6] - A[0] * A[7];
+		AInv[8] = -A[1] * A[3] + A[0] * A[4];
+
+		double invDet = 1.0 / (A[0] * AInv[0] + A[1] * AInv[3] + A[2] * AInv[6]);
+
+		for (int i = 0; i<9; i++)
+			AInv[i] *= invDet;
+	}
+	*/
 protected:
 
 	void AddBTriangle(int i0, int i1, int i2)

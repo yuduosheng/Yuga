@@ -1,6 +1,6 @@
 #include "tetMesh.h"
 
-ofstream debug("debug.txt");
+extern ofstream debug;
 
 TetMesh::TetMesh(const char * filename)
 {
@@ -120,18 +120,19 @@ void TetMesh::init()
 	_InverDm.resize(total_tetrahedra);
 	for (int i = 0; i < total_tetrahedra; ++i)
 	{
-		Dm[0] = oriCoordinates[getVertexIndex(i, 1)] - oriCoordinates[getVertexIndex(i, 0)];
-		Dm[1] = oriCoordinates[getVertexIndex(i, 2)] - oriCoordinates[getVertexIndex(i, 0)];
-		Dm[2] = oriCoordinates[getVertexIndex(i, 3)] - oriCoordinates[getVertexIndex(i, 0)];
+		Tetrahedron& t = getTet(i);
+		Dm[0] = oriCoordinates[t.indices[1]] - oriCoordinates[t.indices[0]];
+		Dm[1] = oriCoordinates[t.indices[2]] - oriCoordinates[t.indices[0]];
+		Dm[2] = oriCoordinates[t.indices[3]] - oriCoordinates[t.indices[0]];
 
 		_InverDm[i].setZero();
 		_InverDm[i] << Dm[0][0], Dm[1][0], Dm[2][0],
-			Dm[0][1], Dm[1][1], Dm[2][1],
-			Dm[0][2], Dm[1][2], Dm[2][2];
+					   Dm[0][1], Dm[1][1], Dm[2][1],
+					   Dm[0][2], Dm[1][2], Dm[2][2];
 
-		_InverDm[i] = _InverDm[i].inverse();
+		_InverDm[i] = _InverDm[i].inverse().eval();
+		
 	}
-	oldPosition = curCoordinates;
 
 	//compute PFPu
 	for (int i = 0; i < total_tetrahedra; ++i)
@@ -141,6 +142,7 @@ void TetMesh::init()
 		//debug << "==========================================" << endl;
 	}
 
+	computeMassMatrix();
 }
 
 void TetMesh::computeElementMassMatrix(int el, double * massMatrix)
@@ -307,14 +309,14 @@ void TetMesh::setCurPosition(VECTOR & q)
 {
 	for (int i = 0; i < total_points; i++)
     {
-    	curCoordinates[i] = q.segment<3>(3 * i);
+    	curCoordinates[i] += q.segment<3>(3 * i);
     }
 }
-void TetMesh::getCurPosition(VECTOR &q)
+void TetMesh::getDisplacement(VECTOR &q)
 {
 	for (int i = 0; i < total_points; i++)
     {
-    	q.segment<3>(3 * i) = curCoordinates[i];
+    	q.segment<3>(3 * i) = curCoordinates[i] - oriCoordinates[i];
     }
 }
 int TetMesh::getClosestVertex(VEC3F pos)

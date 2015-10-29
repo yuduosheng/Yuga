@@ -42,6 +42,15 @@
     <ClInclude Include="CONJUGATE_GRADIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProjectAndUnProject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TIMER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TIMING_BREAKDOWN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -57,6 +66,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FULLIntegrator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CONJUGATE_GRADIENT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TIMER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TIMING_BREAKDOWN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
